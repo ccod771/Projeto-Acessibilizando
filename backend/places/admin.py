@@ -23,9 +23,9 @@ class PlaceAdmin(admin.ModelAdmin):
         "google_place_id",
     )
 
-    inlines = [
+    inlines = (
         PlaceAccessibilityInline,
-    ]
+    )
 
 
 @admin.register(PlaceAccessibility)
@@ -33,15 +33,24 @@ class PlaceAccessibilityAdmin(admin.ModelAdmin):
     list_display = (
         "place",
         "characteristic",
-        "value",
+        "value_boolean",
+        "value_level",
+        "value_number",
         "created_at",
     )
 
     list_filter = (
         "characteristic__category",
+        "characteristic__value_type",
     )
 
     search_fields = (
         "place__name",
         "characteristic__name",
+        "notes",
+        "value_text",
+    )
+
+    ordering = (
+        "-created_at",
     )

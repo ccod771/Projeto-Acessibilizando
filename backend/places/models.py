@@ -40,7 +40,6 @@ class Place(models.Model):
     def __str__(self):
         return self.name
 
-
 class PlaceAccessibility(models.Model):
     place = models.ForeignKey(
         Place,
@@ -54,8 +53,27 @@ class PlaceAccessibility(models.Model):
         related_name="place_accessibilities",
     )
 
-    value = models.CharField(
-        max_length=255,
+    value_boolean = models.BooleanField(
+        null=True,
+        blank=True,
+    )
+
+    value_level = models.ForeignKey(
+        "acessibility.AccessibilityLevel",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="place_accessibilities",
+    )
+
+    value_text = models.TextField(
+        blank=True,
+    )
+
+    value_number = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
         blank=True,
     )
 

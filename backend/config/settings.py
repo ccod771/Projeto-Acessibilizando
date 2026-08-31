@@ -40,10 +40,20 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     
+    "rest_framework",
+    
     'users',
     'places',
     'acessibility',
+    'reviews',
 ]
+
+REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.AllowAny",
+    ],
+}
+
 
 AUTH_USER_MODEL = "users.User" #personal
 

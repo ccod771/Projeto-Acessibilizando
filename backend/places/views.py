@@ -1,3 +1,13 @@
-from django.shortcuts import render
+from rest_framework import viewsets
 
-# Create your views here.
+from .models import Place
+from .serializers import PlaceSerializer
+
+
+class PlaceViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Place.objects.prefetch_related(
+        "accessibilities__characteristic",
+        "accessibilities__value_level",
+    ).all()
+
+    serializer_class = PlaceSerializer

@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     
     'users',
     'places',
+    'acessibility',
 ]
 
 AUTH_USER_MODEL = "users.User" #personal

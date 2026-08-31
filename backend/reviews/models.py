@@ -36,14 +36,16 @@ class Review(models.Model):
     )
 
     class Meta:
-        ordering = ["-created_at"]
-
         constraints = [
             models.UniqueConstraint(
                 fields=["user", "place"],
                 name="unique_review_per_user_place",
-            )
+            ),
+        ]
+
+        ordering = [
+            "-created_at",
         ]
 
     def __str__(self):
-        return f"{self.user} - {self.place} - {self.rating}/5"
+        return f"{self.user.email} - {self.place.name} ({self.rating}/5)"

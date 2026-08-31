@@ -1,14 +1,16 @@
-from rest_framework import permissions
+from rest_framework.permissions import BasePermission
 
 
-class IsOwnerOrReadOnly(permissions.BasePermission):
+class IsReviewOwner(BasePermission):
     """
-    Permite leitura para qualquer usuário.
-    Alteração e exclusão apenas para o proprietário do objeto.
+    Permite alterar ou excluir uma avaliação
+    somente ao usuário que a criou.
     """
 
-    def has_object_permission(self, request, view, obj):
-        if request.method in permissions.SAFE_METHODS:
-            return True
-
+    def has_object_permission(
+        self,
+        request,
+        view,
+        obj,
+    ):
         return obj.user == request.user

@@ -4,6 +4,7 @@ from acessibility.models import AccessibilityCharacteristic
 
 
 class Place(models.Model):
+
     google_place_id = models.CharField(
         max_length=255,
         unique=True,
@@ -40,7 +41,9 @@ class Place(models.Model):
     def __str__(self):
         return self.name
 
+
 class PlaceAccessibility(models.Model):
+
     place = models.ForeignKey(
         Place,
         on_delete=models.CASCADE,
@@ -94,7 +97,18 @@ class PlaceAccessibility(models.Model):
             models.UniqueConstraint(
                 fields=["place", "characteristic"],
                 name="unique_characteristic_per_place",
-            )
+            ),
+        ]
+
+        indexes = [
+            models.Index(
+                fields=["place"],
+                name="place_access_place_idx",
+            ),
+            models.Index(
+                fields=["characteristic"],
+                name="place_access_char_idx",
+            ),
         ]
 
     def __str__(self):

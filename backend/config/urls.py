@@ -10,9 +10,25 @@ from rest_framework_simplejwt.views import (
 urlpatterns = [
     path("admin/", admin.site.urls),
 
-    path("api/", include("places.urls")),
-    path("api/", include("reviews.urls")),
+    # Places
+    path(
+        "api/",
+        include("places.urls"),
+    ),
 
+    # Reviews
+    path(
+        "api/",
+        include("reviews.urls"),
+    ),
+
+    # Users
+    path(
+        "api/auth/",
+        include("users.urls"),
+    ),
+
+    # JWT authentication
     path(
         "api/auth/login/",
         TokenObtainPairView.as_view(),

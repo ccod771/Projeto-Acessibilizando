@@ -1,0 +1,8 @@
+This is the commands for create a database in postgress
+
+
+sudo -u postgres psql
+
+CREATE USER acessibilizando_user WITH PASSWORD '';
+CREATE DATABASE acessibilizando OWNER acessibilizando_user;
+GRANT ALL PRIVILEGES ON DATABASE acessibilizando TO acessibilizando_user;

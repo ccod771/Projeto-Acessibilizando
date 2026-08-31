@@ -81,6 +81,15 @@ class PlaceSerializer(serializers.ModelSerializer):
     latitude = serializers.FloatField()
     longitude = serializers.FloatField()
 
+    average_rating = serializers.FloatField(
+        read_only=True,
+        allow_null=True,
+    )
+
+    review_count = serializers.IntegerField(
+        read_only=True,
+    )
+
     accessibilities = PlaceAccessibilitySerializer(
         many=True,
         read_only=True,
@@ -94,6 +103,8 @@ class PlaceSerializer(serializers.ModelSerializer):
             "name",
             "latitude",
             "longitude",
+            "average_rating",
+            "review_count",
             "accessibilities",
             "created_at",
             "updated_at",

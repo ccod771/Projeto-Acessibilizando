@@ -1,10 +1,13 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+
 import 'package:http/http.dart' as http;
 
 import '../../services/auth_service.dart';
+
 import 'place_detail_screen.dart';
+import '../places/create_place_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,10 +18,15 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   static const primaryColor = Color(0xFF8A00C4);
+
   static const backgroundColor = Color(0xFF12121A);
+
   static const surfaceColor = Color(0xFF1A1921);
+
   static const inputColor = Color(0xFF24222C);
+
   static const textColor = Color(0xFFE7E3EA);
+
   static const secondaryTextColor = Color(0xFFB7B1BC);
 
   static const String baseUrl =
@@ -172,47 +180,54 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Future<void> _openCreatePlace() async {
+    final created = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>
+            const CreatePlaceScreen(),
+      ),
+    );
+
+    if (created == true && mounted) {
+      await _loadPlaces();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final places = _filteredPlaces;
 
     return Scaffold(
       backgroundColor: backgroundColor,
-
       appBar: AppBar(
         backgroundColor: backgroundColor,
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: true,
-
         title: Container(
           padding: const EdgeInsets.symmetric(
             horizontal: 14,
             vertical: 7,
           ),
-
           decoration: BoxDecoration(
             color: Colors.white.withValues(
               alpha: 0.10,
             ),
-
             borderRadius:
                 BorderRadius.circular(18),
-
             border: Border.all(
               color: Colors.white.withValues(
                 alpha: 0.12,
               ),
             ),
           ),
-
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
                 padding:
                     const EdgeInsets.all(5),
-
                 decoration: BoxDecoration(
                   color:
                       Colors.white.withValues(
@@ -221,7 +236,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   borderRadius:
                       BorderRadius.circular(12),
                 ),
-
                 child: Image.asset(
                   'assets/logo.png',
                   width: 42,
@@ -229,9 +243,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   fit: BoxFit.contain,
                 ),
               ),
-
               const SizedBox(width: 10),
-
               const Text(
                 'Acessibilizando',
                 style: TextStyle(
@@ -245,30 +257,64 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-
       body: SafeArea(
         child: RefreshIndicator(
           color: primaryColor,
-
           onRefresh: _loadPlaces,
-
           child: SingleChildScrollView(
             physics:
                 const AlwaysScrollableScrollPhysics(),
-
             padding: const EdgeInsets.fromLTRB(
               20,
               18,
               20,
               32,
             ),
-
             child: Column(
               crossAxisAlignment:
                   CrossAxisAlignment.start,
-
               children: [
                 _buildWelcome(),
+
+                const SizedBox(height: 16),
+
+                // NOVO BOTÃO
+                SizedBox(
+                  width: double.infinity,
+                  height: 54,
+                  child: OutlinedButton.icon(
+                    onPressed: _openCreatePlace,
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor:
+                          primaryColor.withValues(
+                        alpha: 0.08,
+                      ),
+                      side: BorderSide(
+                        color:
+                            primaryColor.withValues(
+                          alpha: 0.55,
+                        ),
+                      ),
+                      shape:
+                          RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(15),
+                      ),
+                    ),
+                    icon: const Icon(
+                      Icons.add_location_alt_rounded,
+                      color: primaryColor,
+                    ),
+                    label: const Text(
+                      'Cadastrar novo local',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
 
                 const SizedBox(height: 32),
 
@@ -281,9 +327,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     letterSpacing: -0.2,
                   ),
                 ),
-
                 const SizedBox(height: 5),
-
                 const Text(
                   'Pesquise por um lugar para consultar sua acessibilidade.',
                   style: TextStyle(
@@ -292,30 +336,23 @@ class _HomeScreenState extends State<HomeScreen> {
                     height: 1.4,
                   ),
                 ),
-
                 const SizedBox(height: 14),
-
                 TextField(
                   controller: _searchController,
-
                   style: const TextStyle(
                     color: textColor,
                   ),
-
                   decoration: InputDecoration(
                     hintText: 'Buscar local...',
-
                     hintStyle:
                         const TextStyle(
                       color: secondaryTextColor,
                     ),
-
                     prefixIcon:
                         const Icon(
                       Icons.search_rounded,
                       color: secondaryTextColor,
                     ),
-
                     suffixIcon:
                         _searchController
                                 .text
@@ -334,18 +371,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                 },
                               )
                             : null,
-
                     filled: true,
-
                     fillColor: inputColor,
-
                     contentPadding:
                         const EdgeInsets
                             .symmetric(
                       vertical: 17,
                       horizontal: 16,
                     ),
-
                     border:
                         OutlineInputBorder(
                       borderRadius:
@@ -355,7 +388,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       borderSide:
                           BorderSide.none,
                     ),
-
                     enabledBorder:
                         OutlineInputBorder(
                       borderRadius:
@@ -370,7 +402,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                     ),
-
                     focusedBorder:
                         OutlineInputBorder(
                       borderRadius:
@@ -392,10 +423,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   mainAxisAlignment:
                       MainAxisAlignment
                           .spaceBetween,
-
                   crossAxisAlignment:
                       CrossAxisAlignment.center,
-
                   children: [
                     const Text(
                       'Locais cadastrados',
@@ -407,7 +436,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         letterSpacing: -0.2,
                       ),
                     ),
-
                     if (!_isLoadingPlaces &&
                         _places.isNotEmpty)
                       Container(
@@ -417,7 +445,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           horizontal: 10,
                           vertical: 5,
                         ),
-
                         decoration:
                             BoxDecoration(
                           color:
@@ -431,7 +458,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             20,
                           ),
                         ),
-
                         child: Text(
                           '${places.length}',
                           style:
@@ -454,7 +480,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Padding(
                       padding:
                           EdgeInsets.all(40),
-
                       child:
                           CircularProgressIndicator(
                         color:
@@ -481,18 +506,15 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildWelcome() {
     return Container(
       width: double.infinity,
-
       // Mais espaço interno para o bloco de boas-vindas.
       padding: const EdgeInsets.symmetric(
         horizontal: 24,
         vertical: 26,
       ),
-
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-
           colors: [
             primaryColor.withValues(
               alpha: 0.18,
@@ -500,16 +522,13 @@ class _HomeScreenState extends State<HomeScreen> {
             surfaceColor,
           ],
         ),
-
         borderRadius:
             BorderRadius.circular(22),
-
         border: Border.all(
           color: primaryColor.withValues(
             alpha: 0.15,
           ),
         ),
-
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(
@@ -520,21 +539,17 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-
       child: Row(
         children: [
           Container(
             width: 58,
             height: 58,
-
             decoration: BoxDecoration(
               color:
                   primaryColor.withValues(
                 alpha: 0.16,
               ),
-
               shape: BoxShape.circle,
-
               border: Border.all(
                 color:
                     primaryColor.withValues(
@@ -542,21 +557,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
-
             child: const Icon(
               Icons.waving_hand_rounded,
               color: primaryColor,
               size: 30,
             ),
           ),
-
           const SizedBox(width: 18),
-
           Expanded(
             child: Column(
               crossAxisAlignment:
                   CrossAxisAlignment.start,
-
               children: [
                 const Text(
                   'Bem-vindo! 👋',
@@ -568,9 +579,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     letterSpacing: -0.3,
                   ),
                 ),
-
                 const SizedBox(height: 7),
-
                 _isLoadingUser
                     ? const SizedBox(
                         height: 18,
@@ -597,9 +606,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               FontWeight.w600,
                         ),
                       ),
-
                 const SizedBox(height: 5),
-
                 const Text(
                   'Vamos encontrar um lugar acessível para você.',
                   style: TextStyle(
@@ -633,37 +640,29 @@ class _HomeScreenState extends State<HomeScreen> {
     return Container(
       margin:
           const EdgeInsets.only(bottom: 12),
-
       decoration: BoxDecoration(
         color: surfaceColor,
-
         borderRadius:
             BorderRadius.circular(17),
-
         border: Border.all(
           color: Colors.white.withValues(
             alpha: 0.05,
           ),
         ),
       ),
-
       child: InkWell(
         borderRadius:
             BorderRadius.circular(17),
-
         onTap: () {
           _openPlace(place);
         },
-
         child: Padding(
           padding: const EdgeInsets.all(17),
-
           child: Row(
             children: [
               Container(
                 width: 52,
                 height: 52,
-
                 decoration: BoxDecoration(
                   gradient:
                       LinearGradient(
@@ -671,7 +670,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         Alignment.topLeft,
                     end: Alignment
                         .bottomRight,
-
                     colors: [
                       primaryColor
                           .withValues(
@@ -683,13 +681,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ],
                   ),
-
                   borderRadius:
                       BorderRadius.circular(
                     14,
                   ),
                 ),
-
                 child: const Icon(
                   Icons
                       .location_on_outlined,
@@ -697,21 +693,17 @@ class _HomeScreenState extends State<HomeScreen> {
                   size: 28,
                 ),
               ),
-
               const SizedBox(width: 15),
-
               Expanded(
                 child: Column(
                   crossAxisAlignment:
                       CrossAxisAlignment.start,
-
                   children: [
                     Text(
                       name,
                       maxLines: 2,
                       overflow:
                           TextOverflow.ellipsis,
-
                       style:
                           const TextStyle(
                         fontSize: 17,
@@ -720,9 +712,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         color: textColor,
                       ),
                     ),
-
                     const SizedBox(height: 7),
-
                     Row(
                       children: [
                         const Icon(
@@ -730,9 +720,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           size: 17,
                           color: Colors.amber,
                         ),
-
                         const SizedBox(width: 4),
-
                         Text(
                           averageRating !=
                                   null
@@ -743,7 +731,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                   1,
                                 )
                               : 'Sem avaliação',
-
                           style:
                               const TextStyle(
                             color:
@@ -753,16 +740,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                 FontWeight.w500,
                           ),
                         ),
-
                         if (averageRating !=
                             null) ...[
                           const SizedBox(
                             width: 6,
                           ),
-
                           Text(
                             '• $reviewCount avaliações',
-
                             style:
                                 const TextStyle(
                               color:
@@ -776,13 +760,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
-
               const SizedBox(width: 8),
-
               Container(
                 width: 34,
                 height: 34,
-
                 decoration: BoxDecoration(
                   color:
                       Colors.white.withValues(
@@ -790,7 +771,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   shape: BoxShape.circle,
                 ),
-
                 child: const Icon(
                   Icons
                       .chevron_right_rounded,
@@ -814,28 +794,22 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Container(
       width: double.infinity,
-
       padding: const EdgeInsets.all(28),
-
       decoration: BoxDecoration(
         color: surfaceColor,
-
         borderRadius:
             BorderRadius.circular(17),
-
         border: Border.all(
           color: Colors.white.withValues(
             alpha: 0.05,
           ),
         ),
       ),
-
       child: Column(
         children: [
           Container(
             width: 64,
             height: 64,
-
             decoration: BoxDecoration(
               color:
                   primaryColor.withValues(
@@ -843,23 +817,18 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               shape: BoxShape.circle,
             ),
-
             child: const Icon(
               Icons.location_off_outlined,
               size: 30,
               color: primaryColor,
             ),
           ),
-
           const SizedBox(height: 16),
-
           Text(
             isSearching
                 ? 'Nenhum local encontrado.'
                 : 'Nenhum local cadastrado.',
-
             textAlign: TextAlign.center,
-
             style: const TextStyle(
               color: textColor,
               fontSize: 16,
@@ -867,14 +836,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   FontWeight.w600,
             ),
           ),
-
           const SizedBox(height: 6),
-
           if (isSearching)
             const Text(
               'Tente buscar por outro nome.',
               textAlign: TextAlign.center,
-
               style: TextStyle(
                 color: secondaryTextColor,
                 fontSize: 13,
@@ -888,15 +854,11 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildError() {
     return Container(
       width: double.infinity,
-
       padding: const EdgeInsets.all(28),
-
       decoration: BoxDecoration(
         color: surfaceColor,
-
         borderRadius:
             BorderRadius.circular(17),
-
         border: Border.all(
           color: Colors.redAccent
               .withValues(
@@ -904,13 +866,11 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-
       child: Column(
         children: [
           Container(
             width: 60,
             height: 60,
-
             decoration: BoxDecoration(
               color: Colors.redAccent
                   .withValues(
@@ -918,20 +878,16 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               shape: BoxShape.circle,
             ),
-
             child: const Icon(
               Icons.error_outline_rounded,
               size: 30,
               color: Colors.redAccent,
             ),
           ),
-
           const SizedBox(height: 14),
-
           const Text(
             'Não foi possível carregar os locais.',
             textAlign: TextAlign.center,
-
             style: TextStyle(
               color: textColor,
               fontSize: 16,
@@ -939,20 +895,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   FontWeight.w600,
             ),
           ),
-
           const SizedBox(height: 16),
-
           FilledButton.icon(
             onPressed: _loadPlaces,
-
             style:
                 FilledButton.styleFrom(
               backgroundColor:
                   primaryColor,
-
               foregroundColor:
                   Colors.white,
-
               shape:
                   RoundedRectangleBorder(
                 borderRadius:
@@ -961,12 +912,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
-
             icon: const Icon(
               Icons.refresh_rounded,
               size: 19,
             ),
-
             label: const Text(
               'Tentar novamente',
             ),

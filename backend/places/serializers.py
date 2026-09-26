@@ -1,3 +1,4 @@
+from django.db import models
 from rest_framework import serializers
 
 from reviews.models import Review
@@ -99,10 +100,7 @@ class PlaceSerializer(serializers.ModelSerializer):
 
         fields = (
             "id",
-            "google_place_id",
             "name",
-            "latitude",
-            "longitude",
             "average_rating",
             "review_count",
             "accessibilities",
@@ -120,3 +118,34 @@ class PlaceSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         )
+
+    def validate_name(self, value):
+        """
+        Impede o cadastro de locais com o mesmo nome.
+
+        A comparação é case-insensitive:
+        "Midway Mall" == "midway mall" == "MIDWAY MALL"
+        """
+
+        value = value.strip()
+
+        if not value:
+            raise serializers.ValidationError(
+                "O nome do local é obrigatório."
+            )
+
+        queryset = Place.objects.filter(
+            name__iexact=value,
+        )
+
+        if self.instance:
+            queryset = queryset.exclude(
+                pk=self.instance.pk,
+            )
+
+        if queryset.exists():
+            raise serializers.ValidationError(
+                "Este local já está cadastrado."
+            )
+
+        return value

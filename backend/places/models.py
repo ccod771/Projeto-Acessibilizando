@@ -4,24 +4,10 @@ from acessibility.models import AccessibilityCharacteristic
 
 
 class Place(models.Model):
-
-    google_place_id = models.CharField(
-        max_length=255,
-        unique=True,
-    )
-
+    
     name = models.CharField(
         max_length=255,
-    )
-
-    latitude = models.DecimalField(
-        max_digits=9,
-        decimal_places=6,
-    )
-
-    longitude = models.DecimalField(
-        max_digits=9,
-        decimal_places=6,
+        unique=True,
     )
 
     characteristics = models.ManyToManyField(

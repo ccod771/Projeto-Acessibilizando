@@ -12,10 +12,8 @@ class PlaceAccessibilityInline(admin.TabularInline):
 class PlaceAdmin(admin.ModelAdmin):
     list_display = (
         "name",
-        "google_place_id",
-        "latitude",
-        "longitude",
         "created_at",
+        "updated_at",
     )
 
     search_fields = (

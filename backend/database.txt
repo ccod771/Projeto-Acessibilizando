@@ -6,3 +6,12 @@ sudo -u postgres psql
 CREATE USER acessibilizando_user WITH PASSWORD '';
 CREATE DATABASE acessibilizando OWNER acessibilizando_user;
 GRANT ALL PRIVILEGES ON DATABASE acessibilizando TO acessibilizando_user;
+
+
+Your .env:
+
+DB_NAME=acessibilizando
+DB_USER=
+DB_PASSWORD=
+DB_HOST=127.0.0.1
+DB_PORT=5432

@@ -1,7 +1,8 @@
 from django.db import models
 
 
-class AccessibilityCategory(models.Model):
+class AccessibilityCategory(models.Model): 
+    
     name = models.CharField(
         max_length=100,
         unique=True
@@ -37,7 +38,7 @@ class AccessibilityCharacteristic(models.Model):
         NUMBER = "NUMBER", "Número"
 
     category = models.ForeignKey(
-        AccessibilityCategory,
+        AccessibilityCategory, #make the link with other model
         on_delete=models.PROTECT,
         related_name="characteristics",
     )

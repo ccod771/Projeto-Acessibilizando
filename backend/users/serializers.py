@@ -38,7 +38,7 @@ class UserSerializer(serializers.ModelSerializer):
                 pk=self.instance.pk,
             )
 
-        if queryset.exists():
+        if queryset.exists():  #Important verification in mobile app, because the user can create a user with the same email.
             raise serializers.ValidationError(
                 "Este email já está cadastrado."
             )
@@ -50,7 +50,7 @@ class UserSerializer(serializers.ModelSerializer):
         value = value.strip()
 
         if not value:
-            raise serializers.ValidationError(
+            raise serializers.ValidationError(  #Important verification in mobile app, because the user can create a user with the same email.
                 "O nome é obrigatório."
             )
 

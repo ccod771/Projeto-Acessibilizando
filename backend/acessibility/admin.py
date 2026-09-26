@@ -1,6 +1,7 @@
 from django.contrib import admin
 
 from .models import (
+    
     AccessibilityCategory,
     AccessibilityCharacteristic,
     AccessibilityLevel,
@@ -9,6 +10,7 @@ from .models import (
 
 @admin.register(AccessibilityLevel)
 class AccessibilityLevelAdmin(admin.ModelAdmin):
+    
     list_display = (
         "name",
         "order",
@@ -26,6 +28,7 @@ class AccessibilityLevelAdmin(admin.ModelAdmin):
 
 @admin.register(AccessibilityCategory)
 class AccessibilityCategoryAdmin(admin.ModelAdmin):
+    
     list_display = (
         "name",
         "created_at",
@@ -43,6 +46,7 @@ class AccessibilityCategoryAdmin(admin.ModelAdmin):
 
 @admin.register(AccessibilityCharacteristic)
 class AccessibilityCharacteristicAdmin(admin.ModelAdmin):
+    
     list_display = (
         "name",
         "category",

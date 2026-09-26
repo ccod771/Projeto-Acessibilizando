@@ -130,7 +130,7 @@ class PlaceSerializer(serializers.ModelSerializer):
 
         if not value:
             raise serializers.ValidationError(
-                "O nome do local é obrigatório."
+                "O nome do local é obrigatório." #Very important in mobile app, because the user can create a place with the same name.
             )
 
         queryset = Place.objects.filter(
@@ -145,6 +145,6 @@ class PlaceSerializer(serializers.ModelSerializer):
         if queryset.exists():
             raise serializers.ValidationError(
                 "Este local já está cadastrado."
-            )
+            ) #Very important in mobile app, because the user can create a place with the same name.
 
         return value

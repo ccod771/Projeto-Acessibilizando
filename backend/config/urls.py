@@ -35,6 +35,7 @@ urlpatterns = [
         name="token_obtain_pair",
     ),
 
+    # JWT token refresh
     path(
         "api/auth/refresh/",
         TokenRefreshView.as_view(),

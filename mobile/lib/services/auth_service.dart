@@ -6,8 +6,8 @@ import 'package:http/http.dart' as http;
 
 class AuthService {
 
-  // No celular físico, NÃO use localhost.
-  // O celular precisa acessar o IP da máquina onde o Django está rodando.
+  // Dont use localhost in your phone
+  // The mobile phone needs to access the IP address of the machine where Django is running.
 
   static const String baseUrl = 'http://192.168.1.66:8000';
 
@@ -73,7 +73,7 @@ class AuthService {
 
   }
 
-  // ADICIONADO: registro de usuário
+  // Register method
 
   Future<Map<String, dynamic>> register({
 
@@ -124,8 +124,8 @@ class AuthService {
         }),
 
       );
-
-      print('========== REGISTER API ==========');
+      //Only for debug
+      print('========== REGISTER API =========='); 
 
       print('URL: $baseUrl/api/auth/register/');
 
@@ -214,7 +214,7 @@ class AuthService {
 
   }
 
-  Future<Map<String, dynamic>?> getMe() async {
+  Future<Map<String, dynamic>?> getMe() async { //Get own user logged in information
 
     final token = await getAccessToken();
 
@@ -247,6 +247,7 @@ class AuthService {
     return jsonDecode(response.body);
 
   }
+
 
   Future<Map<String, dynamic>> updateProfile({
   required String name,

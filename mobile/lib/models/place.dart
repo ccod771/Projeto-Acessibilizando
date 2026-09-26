@@ -1,3 +1,10 @@
+
+/*In this code, the google place Id, latitude and longitude 
+is of the old project, but in this time i dont removed, because 
+i want implement maps in the future.
+*/
+
+
 class Place {
   final int id;
   final String googlePlaceId;

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../services/auth_service.dart';
+
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
 
@@ -8,41 +10,203 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  final AuthService _authService = AuthService();
+
   final _nameController = TextEditingController();
+
   final _emailController = TextEditingController();
+
   final _ageController = TextEditingController();
+
   final _passwordController = TextEditingController();
+
   final _confirmPasswordController = TextEditingController();
 
   bool _mobility = false;
+
   bool _speaks = true;
+
   bool _sensorySensitivity = false;
 
   bool _obscurePassword = true;
+
   bool _obscureConfirmPassword = true;
+
+  bool _isLoading = false;
 
   @override
   void dispose() {
     _nameController.dispose();
+
     _emailController.dispose();
+
     _ageController.dispose();
+
     _passwordController.dispose();
+
     _confirmPasswordController.dispose();
 
     super.dispose();
   }
 
-  void _register() {
-    // Vamos conectar com a API depois.
+  Future<void> _register() async {
+    if (_isLoading) {
+      return;
+    }
+
+    final name = _nameController.text.trim();
+
+    final email = _emailController.text.trim();
+
+    final ageText = _ageController.text.trim();
+
+    final password = _passwordController.text;
+
+    final confirmPassword = _confirmPasswordController.text;
+
+    if (name.isEmpty ||
+        email.isEmpty ||
+        ageText.isEmpty ||
+        password.isEmpty ||
+        confirmPassword.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Preencha todos os campos obrigatórios.',
+          ),
+        ),
+      );
+
+      return;
+    }
+
+    final age = int.tryParse(ageText);
+
+    if (age == null || age <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Digite uma idade válida.',
+          ),
+        ),
+      );
+
+      return;
+    }
+
+    if (password != confirmPassword) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'As senhas não são iguais.',
+          ),
+        ),
+      );
+
+      return;
+    }
+
+    if (password.length < 8) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'A senha deve possuir pelo menos 8 caracteres.',
+          ),
+        ),
+      );
+
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final result = await _authService.register(
+        email: email,
+        name: name,
+        age: age,
+        mobility: _mobility,
+        speaks: _speaks,
+        sensorySensitivity: _sensorySensitivity,
+        password: password,
+      );
+
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _isLoading = false;
+      });
+
+      if (result['success'] == true) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Conta criada com sucesso!',
+            ),
+          ),
+        );
+
+        Navigator.pop(context);
+
+        return;
+      }
+
+      final data = result['data'];
+
+      String message = 'Erro ao criar conta.';
+
+      if (data is Map) {
+        if (data['email'] is List) {
+          message = data['email'][0].toString();
+        } else if (data['password'] is List) {
+          message = data['password'][0].toString();
+        } else if (data['detail'] != null) {
+          message = data['detail'].toString();
+        } else if (data['error'] != null) {
+          message = data['error'].toString();
+        }
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _isLoading = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Erro ao criar conta: $e',
+          ),
+        ),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     const primaryColor = Color(0xFF8A00C4);
+
     const backgroundColor = Color(0xFF12121A);
+
     const surfaceColor = Color(0xFF1A1921);
+
     const inputColor = Color(0xFF24222C);
+
     const textColor = Color(0xFFE7E3EA);
+
     const secondaryTextColor = Color(0xFFB7B1BC);
 
     return Scaffold(
@@ -297,7 +461,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                           onPressed: () {
                             setState(() {
-                              _obscurePassword = !_obscurePassword;
+                              _obscurePassword =
+                                  !_obscurePassword;
                             });
                           },
                         ),
@@ -363,14 +528,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        onPressed: _register,
-                        child: const Text(
-                          'Criar conta',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                        onPressed: _isLoading ? null : _register,
+                        child: _isLoading
+                            ? const SizedBox(
+                                width: 22,
+                                height: 22,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : const Text(
+                                'Criar conta',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
                       ),
                     ),
 

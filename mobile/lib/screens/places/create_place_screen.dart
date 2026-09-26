@@ -12,6 +12,7 @@ class CreatePlaceScreen extends StatefulWidget {
 
 class _CreatePlaceScreenState
     extends State<CreatePlaceScreen> {
+
   final PlaceService _placeService = PlaceService();
 
   final TextEditingController _nameController =
@@ -19,11 +20,20 @@ class _CreatePlaceScreenState
 
   bool _isLoading = false;
 
+  bool _hasElevator = false;
+  bool _highMovement = false;
+  bool _strongLights = false;
+
   static const primaryColor = Color(0xFF8A00C4);
+
   static const backgroundColor = Color(0xFF12121A);
+
   static const surfaceColor = Color(0xFF1A1921);
+
   static const inputColor = Color(0xFF24222C);
+
   static const textColor = Color(0xFFE7E3EA);
+
   static const secondaryTextColor = Color(0xFFB7B1BC);
 
   @override
@@ -53,6 +63,9 @@ class _CreatePlaceScreenState
     try {
       final result = await _placeService.createPlace(
         name: name,
+        hasElevator: _hasElevator,
+        highMovement: _highMovement,
+        strongLights: _strongLights,
       );
 
       if (!mounted) {
@@ -165,7 +178,9 @@ class _CreatePlaceScreenState
                 CrossAxisAlignment.start,
             children: [
               _buildHeader(),
+
               const SizedBox(height: 24),
+
               _buildFormCard(),
             ],
           ),
@@ -213,7 +228,9 @@ class _CreatePlaceScreenState
               size: 29,
             ),
           ),
+
           const SizedBox(width: 15),
+
           const Expanded(
             child: Column(
               crossAxisAlignment:
@@ -227,7 +244,9 @@ class _CreatePlaceScreenState
                     fontWeight: FontWeight.w700,
                   ),
                 ),
+
                 SizedBox(height: 5),
+
                 Text(
                   'Cadastre um local para que outras pessoas possam avaliá-lo.',
                   style: TextStyle(
@@ -302,6 +321,57 @@ class _CreatePlaceScreenState
 
           const SizedBox(height: 26),
 
+          _buildLabel(
+            'Características do local',
+          ),
+
+          const SizedBox(height: 8),
+
+          _buildCheckbox(
+            title: 'Tem elevador',
+            subtitle:
+                'O local possui elevador disponível.',
+            icon: Icons.elevator_rounded,
+            value: _hasElevator,
+            onChanged: (value) {
+              setState(() {
+                _hasElevator = value;
+              });
+            },
+          ),
+
+          const SizedBox(height: 8),
+
+          _buildCheckbox(
+            title: 'Muita movimentação',
+            subtitle:
+                'O local costuma ter grande circulação de pessoas.',
+            icon: Icons.groups_rounded,
+            value: _highMovement,
+            onChanged: (value) {
+              setState(() {
+                _highMovement = value;
+              });
+            },
+          ),
+
+          const SizedBox(height: 8),
+
+          _buildCheckbox(
+            title: 'Luzes fortes',
+            subtitle:
+                'O local possui iluminação intensa.',
+            icon: Icons.light_mode_rounded,
+            value: _strongLights,
+            onChanged: (value) {
+              setState(() {
+                _strongLights = value;
+              });
+            },
+          ),
+
+          const SizedBox(height: 26),
+
           SizedBox(
             width: double.infinity,
             height: 54,
@@ -351,6 +421,92 @@ class _CreatePlaceScreenState
     );
   }
 
+  Widget _buildCheckbox({
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required bool value,
+    required ValueChanged<bool> onChanged,
+  }) {
+    return AnimatedContainer(
+      duration: const Duration(
+        milliseconds: 180,
+      ),
+      decoration: BoxDecoration(
+        color: value
+            ? primaryColor.withValues(
+                alpha: 0.10,
+              )
+            : inputColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: value
+              ? primaryColor.withValues(
+                  alpha: 0.35,
+                )
+              : Colors.white.withValues(
+                  alpha: 0.04,
+                ),
+        ),
+      ),
+      child: CheckboxListTile(
+        value: value,
+        onChanged:
+            _isLoading ? null : (value) {
+              onChanged(value ?? false);
+            },
+        activeColor: primaryColor,
+        checkColor: Colors.white,
+        controlAffinity:
+            ListTileControlAffinity.trailing,
+        contentPadding:
+            const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: 5,
+        ),
+        secondary: Container(
+          width: 42,
+          height: 42,
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(
+              alpha: 0.07,
+            ),
+            borderRadius:
+                BorderRadius.circular(12),
+          ),
+          child: Icon(
+            icon,
+            color: value
+                ? primaryColor
+                : secondaryTextColor,
+            size: 22,
+          ),
+        ),
+        title: Text(
+          title,
+          style: const TextStyle(
+            color: textColor,
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        subtitle: Padding(
+          padding: const EdgeInsets.only(
+            top: 3,
+          ),
+          child: Text(
+            subtitle,
+            style: const TextStyle(
+              color: secondaryTextColor,
+              fontSize: 11.5,
+              height: 1.3,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildLabel(String text) {
     return Text(
       text,
@@ -379,16 +535,19 @@ class _CreatePlaceScreenState
       ),
       filled: true,
       fillColor: inputColor,
-      contentPadding: const EdgeInsets.symmetric(
+      contentPadding:
+          const EdgeInsets.symmetric(
         horizontal: 16,
         vertical: 16,
       ),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(15),
+        borderRadius:
+            BorderRadius.circular(15),
         borderSide: BorderSide.none,
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(15),
+        borderRadius:
+            BorderRadius.circular(15),
         borderSide: BorderSide(
           color: Colors.white.withValues(
             alpha: 0.04,
@@ -396,7 +555,8 @@ class _CreatePlaceScreenState
         ),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(15),
+        borderRadius:
+            BorderRadius.circular(15),
         borderSide: const BorderSide(
           color: primaryColor,
           width: 1.5,

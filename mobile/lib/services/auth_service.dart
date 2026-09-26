@@ -248,6 +248,86 @@ class AuthService {
 
   }
 
+  Future<Map<String, dynamic>> updateProfile({
+  required String name,
+  required String email,
+  required bool mobility,
+  required bool speaks,
+  required bool sensorySensitivity,
+}) async {
+  final token = await getAccessToken();
+
+  if (token == null) {
+    return {
+      'success': false,
+      'statusCode': 401,
+      'data': {
+        'detail': 'Você precisa estar autenticado.',
+      },
+    };
+  }
+
+  try {
+    final response = await http.patch(
+      Uri.parse('$baseUrl/api/auth/me/'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({
+        'name': name,
+        'email': email,
+        'mobility': mobility,
+        'speaks': speaks,
+        'sensory_sensitivity': sensorySensitivity,
+      }),
+    );
+
+    print('========== UPDATE PROFILE ==========');
+    print('URL: $baseUrl/api/auth/me/');
+    print('Status: ${response.statusCode}');
+    print('Resposta: ${response.body}');
+    print('====================================');
+
+    dynamic data;
+
+    try {
+      data = jsonDecode(response.body);
+    } catch (_) {
+      data = {
+        'message': response.body,
+      };
+    }
+
+    if (response.statusCode >= 200 &&
+        response.statusCode < 300) {
+      return {
+        'success': true,
+        'statusCode': response.statusCode,
+        'data': data,
+      };
+    }
+
+    return {
+      'success': false,
+      'statusCode': response.statusCode,
+      'data': data,
+    };
+  } catch (e) {
+    print('========== ERRO UPDATE PROFILE ==========');
+    print(e);
+    print('=========================================');
+
+    return {
+      'success': false,
+      'statusCode': 0,
+      'data': {
+        'error': e.toString(),
+      },
+    };
+  }
+}
+
   Future<void> logout() async {
 
     await _storage.delete(key: _accessTokenKey);

@@ -2,15 +2,7 @@ name: mobile
 
 description: "A new Flutter project."
 
-# The following line prevents the package from being accidentally published to
-# pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none'
-
-# The following defines the version and build number for your application.
-# A version number is three numbers separated by dots, like 1.2.43
-# followed by an optional build number separated by a +.
-# Both the version and the builder number may be overridden in flutter
-# build by specifying --build-name and --build-number, respectively.
 
 version: 1.0.0+1
 
@@ -22,13 +14,9 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^1.0.8
-
   dio: ^5.11.0
-
   flutter_secure_storage: ^11.0.0
-
   flutter_riverpod: ^2.6.1
-
   http: ^1.6.0
 
 dev_dependencies:
@@ -36,9 +24,30 @@ dev_dependencies:
     sdk: flutter
 
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
+  flutter_native_splash: ^2.4.6
 
 flutter:
   uses-material-design: true
 
   assets:
     - assets/logo.png
+
+# Ícone do aplicativo
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/logo.png"
+
+# Splash screen
+
+flutter_native_splash:
+  color: "#FFFFFF"
+  image: assets/logo.png
+  android_gravity: center
+
+  android_12:
+    color: "#FFFFFF"
+    image: assets/logo.png
+    icon_background_color: "#FFFFFF"

@@ -101,6 +101,11 @@ class PlaceSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "name",
+
+            "has_elevator",
+            "high_movement",
+            "strong_lights",
+
             "average_rating",
             "review_count",
             "accessibilities",
@@ -120,12 +125,6 @@ class PlaceSerializer(serializers.ModelSerializer):
         )
 
     def validate_name(self, value):
-        """
-        Impede o cadastro de locais com o mesmo nome.
-
-        A comparação é case-insensitive:
-        "Midway Mall" == "midway mall" == "MIDWAY MALL"
-        """
 
         value = value.strip()
 

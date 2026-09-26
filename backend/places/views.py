@@ -2,14 +2,16 @@ from django.db.models import Avg, Count
 
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
-
+from rest_framework.filters import SearchFilter
 from .models import Place
 from .serializers import PlaceSerializer
-
+from .pagination import PlacePagination
 
 class PlaceViewSet(viewsets.ModelViewSet):
     serializer_class = PlaceSerializer
-
+    pagination_class = PlacePagination
+    filter_backends = [SearchFilter]
+    search_fields = ['name']
     permission_classes = (
         IsAuthenticatedOrReadOnly,
     )

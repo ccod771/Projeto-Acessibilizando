@@ -40,6 +40,9 @@ class PlaceService {
 
   Future<Map<String, dynamic>> createPlace({
     required String name,
+    required bool hasElevator,
+    required bool highMovement,
+    required bool strongLights,
   }) async {
     final token = await _authService.getAccessToken();
 
@@ -57,6 +60,9 @@ class PlaceService {
       },
       body: jsonEncode({
         'name': name,
+        'has_elevator': hasElevator,
+        'high_movement': highMovement,
+        'strong_lights': strongLights,
       }),
     );
 

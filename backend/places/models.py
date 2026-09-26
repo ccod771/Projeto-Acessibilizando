@@ -4,10 +4,22 @@ from acessibility.models import AccessibilityCharacteristic
 
 
 class Place(models.Model):
-    
+
     name = models.CharField(
         max_length=255,
         unique=True,
+    )
+
+    has_elevator = models.BooleanField(
+        default=False,
+    )
+
+    high_movement = models.BooleanField(
+        default=False,
+    )
+
+    strong_lights = models.BooleanField(
+        default=False,
     )
 
     characteristics = models.ManyToManyField(
@@ -79,6 +91,7 @@ class PlaceAccessibility(models.Model):
     )
 
     class Meta:
+
         constraints = [
             models.UniqueConstraint(
                 fields=["place", "characteristic"],

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import '../../services/auth_service.dart';
+import 'place_detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -20,7 +21,8 @@ class _HomeScreenState extends State<HomeScreen> {
   static const textColor = Color(0xFFE7E3EA);
   static const secondaryTextColor = Color(0xFFB7B1BC);
 
-  static const String baseUrl = 'http://192.168.1.66:8000';
+  static const String baseUrl =
+      'http://192.168.1.66:8000';
 
   final AuthService _authService = AuthService();
 
@@ -30,6 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
   String _userName = 'Usuário';
 
   bool _isLoadingUser = true;
+
   bool _isLoadingPlaces = true;
 
   String? _placesError;
@@ -37,14 +40,16 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Map<String, dynamic>> _places = [];
 
   List<Map<String, dynamic>> get _filteredPlaces {
-    final search = _searchController.text.trim().toLowerCase();
+    final search =
+        _searchController.text.trim().toLowerCase();
 
     if (search.isEmpty) {
       return _places;
     }
 
     return _places.where((place) {
-      final name = place['name']?.toString().toLowerCase() ?? '';
+      final name =
+          place['name']?.toString().toLowerCase() ?? '';
 
       return name.contains(search);
     }).toList();
@@ -55,6 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
 
     _loadUser();
+
     _loadPlaces();
 
     _searchController.addListener(() {
@@ -101,6 +107,7 @@ class _HomeScreenState extends State<HomeScreen> {
       if (response.statusCode != 200) {
         setState(() {
           _isLoadingPlaces = false;
+
           _placesError =
               'Não foi possível carregar os locais.';
         });
@@ -114,7 +121,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
       if (data is List) {
         results = data;
-      } else if (data is Map && data['results'] is List) {
+      } else if (data is Map &&
+          data['results'] is List) {
         results = data['results'];
       } else {
         results = [];
@@ -124,11 +132,13 @@ class _HomeScreenState extends State<HomeScreen> {
         _places = results
             .whereType<Map>()
             .map(
-              (place) => Map<String, dynamic>.from(place),
+              (place) =>
+                  Map<String, dynamic>.from(place),
             )
             .toList();
 
         _isLoadingPlaces = false;
+
         _placesError = null;
       });
     } catch (e) {
@@ -138,6 +148,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
       setState(() {
         _isLoadingPlaces = false;
+
         _placesError =
             'Erro ao conectar com o servidor.';
       });
@@ -148,16 +159,14 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void _openPlace(Map<String, dynamic> place) {
-    final placeId = place['id'];
-
-    print('Local selecionado: ${place['name']}');
-    print('ID do local: $placeId');
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Local selecionado: ${place['name']}',
+  void _openPlace(
+    Map<String, dynamic> place,
+  ) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PlaceDetailScreen(
+          place: place,
         ),
       ),
     );
@@ -169,103 +178,207 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       backgroundColor: backgroundColor,
+
       appBar: AppBar(
-        backgroundColor: primaryColor,
-        foregroundColor: Colors.white,
-        title: const Text(
-          'Acessibilizando',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
+        backgroundColor: backgroundColor,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        centerTitle: true,
+
+        title: Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 14,
+            vertical: 7,
+          ),
+
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(
+              alpha: 0.10,
+            ),
+
+            borderRadius:
+                BorderRadius.circular(18),
+
+            border: Border.all(
+              color: Colors.white.withValues(
+                alpha: 0.12,
+              ),
+            ),
+          ),
+
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding:
+                    const EdgeInsets.all(5),
+
+                decoration: BoxDecoration(
+                  color:
+                      Colors.white.withValues(
+                    alpha: 0.16,
+                  ),
+                  borderRadius:
+                      BorderRadius.circular(12),
+                ),
+
+                child: Image.asset(
+                  'assets/logo.png',
+                  width: 42,
+                  height: 42,
+                  fit: BoxFit.contain,
+                ),
+              ),
+
+              const SizedBox(width: 10),
+
+              const Text(
+                'Acessibilizando',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.3,
+                ),
+              ),
+            ],
           ),
         ),
       ),
+
       body: SafeArea(
         child: RefreshIndicator(
+          color: primaryColor,
+
           onRefresh: _loadPlaces,
+
           child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.all(20),
+            physics:
+                const AlwaysScrollableScrollPhysics(),
+
+            padding: const EdgeInsets.fromLTRB(
+              20,
+              18,
+              20,
+              32,
+            ),
+
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment:
+                  CrossAxisAlignment.start,
+
               children: [
-                const SizedBox(height: 8),
+                _buildWelcome(),
 
-                const Text(
-                  'Bem-vindo!',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: textColor,
-                  ),
-                ),
-
-                const SizedBox(height: 6),
-
-                _isLoadingUser
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: primaryColor,
-                        ),
-                      )
-                    : Text(
-                        _userName,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          color: secondaryTextColor,
-                        ),
-                      ),
-
-                const SizedBox(height: 28),
+                const SizedBox(height: 32),
 
                 const Text(
                   'Encontre um local',
                   style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 21,
+                    fontWeight: FontWeight.w700,
                     color: textColor,
+                    letterSpacing: -0.2,
                   ),
                 ),
 
-                const SizedBox(height: 12),
+                const SizedBox(height: 5),
+
+                const Text(
+                  'Pesquise por um lugar para consultar sua acessibilidade.',
+                  style: TextStyle(
+                    color: secondaryTextColor,
+                    fontSize: 14,
+                    height: 1.4,
+                  ),
+                ),
+
+                const SizedBox(height: 14),
 
                 TextField(
                   controller: _searchController,
+
                   style: const TextStyle(
                     color: textColor,
                   ),
+
                   decoration: InputDecoration(
                     hintText: 'Buscar local...',
-                    hintStyle: const TextStyle(
+
+                    hintStyle:
+                        const TextStyle(
                       color: secondaryTextColor,
                     ),
-                    prefixIcon: const Icon(
-                      Icons.search,
+
+                    prefixIcon:
+                        const Icon(
+                      Icons.search_rounded,
                       color: secondaryTextColor,
                     ),
+
                     suffixIcon:
-                        _searchController.text.isNotEmpty
+                        _searchController
+                                .text
+                                .isNotEmpty
                             ? IconButton(
-                                icon: const Icon(
-                                  Icons.clear,
-                                  color: secondaryTextColor,
+                                icon:
+                                    const Icon(
+                                  Icons
+                                      .close_rounded,
+                                  color:
+                                      secondaryTextColor,
                                 ),
                                 onPressed: () {
-                                  _searchController.clear();
+                                  _searchController
+                                      .clear();
                                 },
                               )
                             : null,
+
                     filled: true,
+
                     fillColor: inputColor,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide.none,
+
+                    contentPadding:
+                        const EdgeInsets
+                            .symmetric(
+                      vertical: 17,
+                      horizontal: 16,
                     ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: const BorderSide(
+
+                    border:
+                        OutlineInputBorder(
+                      borderRadius:
+                          BorderRadius.circular(
+                        15,
+                      ),
+                      borderSide:
+                          BorderSide.none,
+                    ),
+
+                    enabledBorder:
+                        OutlineInputBorder(
+                      borderRadius:
+                          BorderRadius.circular(
+                        15,
+                      ),
+                      borderSide:
+                          BorderSide(
+                        color: Colors.white
+                            .withValues(
+                          alpha: 0.04,
+                        ),
+                      ),
+                    ),
+
+                    focusedBorder:
+                        OutlineInputBorder(
+                      borderRadius:
+                          BorderRadius.circular(
+                        15,
+                      ),
+                      borderSide:
+                          const BorderSide(
                         color: primaryColor,
                         width: 1.5,
                       ),
@@ -273,25 +386,79 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
 
-                const SizedBox(height: 28),
+                const SizedBox(height: 32),
 
-                const Text(
-                  'Locais cadastrados',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                    color: textColor,
-                  ),
+                Row(
+                  mainAxisAlignment:
+                      MainAxisAlignment
+                          .spaceBetween,
+
+                  crossAxisAlignment:
+                      CrossAxisAlignment.center,
+
+                  children: [
+                    const Text(
+                      'Locais cadastrados',
+                      style: TextStyle(
+                        fontSize: 21,
+                        fontWeight:
+                            FontWeight.w700,
+                        color: textColor,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+
+                    if (!_isLoadingPlaces &&
+                        _places.isNotEmpty)
+                      Container(
+                        padding:
+                            const EdgeInsets
+                                .symmetric(
+                          horizontal: 10,
+                          vertical: 5,
+                        ),
+
+                        decoration:
+                            BoxDecoration(
+                          color:
+                              primaryColor
+                                  .withValues(
+                            alpha: 0.12,
+                          ),
+                          borderRadius:
+                              BorderRadius
+                                  .circular(
+                            20,
+                          ),
+                        ),
+
+                        child: Text(
+                          '${places.length}',
+                          style:
+                              const TextStyle(
+                            color:
+                                primaryColor,
+                            fontSize: 13,
+                            fontWeight:
+                                FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
 
-                const SizedBox(height: 12),
+                const SizedBox(height: 14),
 
                 if (_isLoadingPlaces)
                   const Center(
                     child: Padding(
-                      padding: EdgeInsets.all(32),
-                      child: CircularProgressIndicator(
-                        color: primaryColor,
+                      padding:
+                          EdgeInsets.all(40),
+
+                      child:
+                          CircularProgressIndicator(
+                        color:
+                            primaryColor,
                       ),
                     ),
                   )
@@ -300,7 +467,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 else if (places.isEmpty)
                   _buildEmptyPlaces()
                 else
-                  ...places.map(_buildPlaceCard),
+                  ...places.map(
+                    _buildPlaceCard,
+                  ),
               ],
             ),
           ),
@@ -309,10 +478,151 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget _buildWelcome() {
+    return Container(
+      width: double.infinity,
+
+      // Mais espaço interno para o bloco de boas-vindas.
+      padding: const EdgeInsets.symmetric(
+        horizontal: 24,
+        vertical: 26,
+      ),
+
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+
+          colors: [
+            primaryColor.withValues(
+              alpha: 0.18,
+            ),
+            surfaceColor,
+          ],
+        ),
+
+        borderRadius:
+            BorderRadius.circular(22),
+
+        border: Border.all(
+          color: primaryColor.withValues(
+            alpha: 0.15,
+          ),
+        ),
+
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(
+              alpha: 0.15,
+            ),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+
+      child: Row(
+        children: [
+          Container(
+            width: 58,
+            height: 58,
+
+            decoration: BoxDecoration(
+              color:
+                  primaryColor.withValues(
+                alpha: 0.16,
+              ),
+
+              shape: BoxShape.circle,
+
+              border: Border.all(
+                color:
+                    primaryColor.withValues(
+                  alpha: 0.25,
+                ),
+              ),
+            ),
+
+            child: const Icon(
+              Icons.waving_hand_rounded,
+              color: primaryColor,
+              size: 30,
+            ),
+          ),
+
+          const SizedBox(width: 18),
+
+          Expanded(
+            child: Column(
+              crossAxisAlignment:
+                  CrossAxisAlignment.start,
+
+              children: [
+                const Text(
+                  'Bem-vindo! 👋',
+                  style: TextStyle(
+                    color: textColor,
+                    fontSize: 23,
+                    fontWeight:
+                        FontWeight.w700,
+                    letterSpacing: -0.3,
+                  ),
+                ),
+
+                const SizedBox(height: 7),
+
+                _isLoadingUser
+                    ? const SizedBox(
+                        height: 18,
+                        width: 18,
+                        child:
+                            CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color:
+                              primaryColor,
+                        ),
+                      )
+                    : Text(
+                        _userName,
+                        maxLines: 1,
+                        overflow:
+                            TextOverflow
+                                .ellipsis,
+                        style:
+                            const TextStyle(
+                          color:
+                              primaryColor,
+                          fontSize: 17,
+                          fontWeight:
+                              FontWeight.w600,
+                        ),
+                      ),
+
+                const SizedBox(height: 5),
+
+                const Text(
+                  'Vamos encontrar um lugar acessível para você.',
+                  style: TextStyle(
+                    color:
+                        secondaryTextColor,
+                    fontSize: 13,
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildPlaceCard(
     Map<String, dynamic> place,
   ) {
-    final name = place['name']?.toString() ?? 'Local';
+    final name =
+        place['name']?.toString() ??
+            'Local';
 
     final averageRating =
         place['average_rating'];
@@ -321,59 +631,102 @@ class _HomeScreenState extends State<HomeScreen> {
         place['review_count'] ?? 0;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin:
+          const EdgeInsets.only(bottom: 12),
+
       decoration: BoxDecoration(
         color: surfaceColor,
-        borderRadius: BorderRadius.circular(16),
+
+        borderRadius:
+            BorderRadius.circular(17),
+
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.05),
+          color: Colors.white.withValues(
+            alpha: 0.05,
+          ),
         ),
       ),
+
       child: InkWell(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius:
+            BorderRadius.circular(17),
+
         onTap: () {
           _openPlace(place);
         },
+
         child: Padding(
-          padding: const EdgeInsets.all(18),
+          padding: const EdgeInsets.all(17),
+
           child: Row(
             children: [
               Container(
-                width: 50,
-                height: 50,
+                width: 52,
+                height: 52,
+
                 decoration: BoxDecoration(
-                  color: primaryColor.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(12),
+                  gradient:
+                      LinearGradient(
+                    begin:
+                        Alignment.topLeft,
+                    end: Alignment
+                        .bottomRight,
+
+                    colors: [
+                      primaryColor
+                          .withValues(
+                        alpha: 0.20,
+                      ),
+                      primaryColor
+                          .withValues(
+                        alpha: 0.08,
+                      ),
+                    ],
+                  ),
+
+                  borderRadius:
+                      BorderRadius.circular(
+                    14,
+                  ),
                 ),
+
                 child: const Icon(
-                  Icons.location_on_outlined,
+                  Icons
+                      .location_on_outlined,
                   color: primaryColor,
                   size: 28,
                 ),
               ),
 
-              const SizedBox(width: 16),
+              const SizedBox(width: 15),
 
               Expanded(
                 child: Column(
                   crossAxisAlignment:
                       CrossAxisAlignment.start,
+
                   children: [
                     Text(
                       name,
-                      style: const TextStyle(
+                      maxLines: 2,
+                      overflow:
+                          TextOverflow.ellipsis,
+
+                      style:
+                          const TextStyle(
                         fontSize: 17,
-                        fontWeight: FontWeight.w600,
+                        fontWeight:
+                            FontWeight.w600,
                         color: textColor,
                       ),
                     ),
 
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 7),
 
                     Row(
                       children: [
                         const Icon(
-                          Icons.star,
+                          Icons.star_rounded,
                           size: 17,
                           color: Colors.amber,
                         ),
@@ -381,25 +734,40 @@ class _HomeScreenState extends State<HomeScreen> {
                         const SizedBox(width: 4),
 
                         Text(
-                          averageRating != null
+                          averageRating !=
+                                  null
                               ? double.parse(
-                                  averageRating.toString(),
-                                ).toStringAsFixed(1)
+                                  averageRating
+                                      .toString(),
+                                ).toStringAsFixed(
+                                  1,
+                                )
                               : 'Sem avaliação',
-                          style: const TextStyle(
-                            color: secondaryTextColor,
+
+                          style:
+                              const TextStyle(
+                            color:
+                                secondaryTextColor,
                             fontSize: 14,
+                            fontWeight:
+                                FontWeight.w500,
                           ),
                         ),
 
-                        if (averageRating != null) ...[
-                          const SizedBox(width: 6),
+                        if (averageRating !=
+                            null) ...[
+                          const SizedBox(
+                            width: 6,
+                          ),
 
                           Text(
-                            '($reviewCount avaliações)',
-                            style: const TextStyle(
-                              color: secondaryTextColor,
-                              fontSize: 13,
+                            '• $reviewCount avaliações',
+
+                            style:
+                                const TextStyle(
+                              color:
+                                  secondaryTextColor,
+                              fontSize: 12,
                             ),
                           ),
                         ],
@@ -409,9 +777,27 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-              const Icon(
-                Icons.chevron_right,
-                color: secondaryTextColor,
+              const SizedBox(width: 8),
+
+              Container(
+                width: 34,
+                height: 34,
+
+                decoration: BoxDecoration(
+                  color:
+                      Colors.white.withValues(
+                    alpha: 0.04,
+                  ),
+                  shape: BoxShape.circle,
+                ),
+
+                child: const Icon(
+                  Icons
+                      .chevron_right_rounded,
+                  color:
+                      secondaryTextColor,
+                  size: 21,
+                ),
               ),
             ],
           ),
@@ -422,38 +808,78 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildEmptyPlaces() {
     final isSearching =
-        _searchController.text.trim().isNotEmpty;
+        _searchController.text
+            .trim()
+            .isNotEmpty;
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
+
+      padding: const EdgeInsets.all(28),
+
       decoration: BoxDecoration(
         color: surfaceColor,
-        borderRadius: BorderRadius.circular(16),
+
+        borderRadius:
+            BorderRadius.circular(17),
+
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.05),
+          color: Colors.white.withValues(
+            alpha: 0.05,
+          ),
         ),
       ),
+
       child: Column(
         children: [
-          const Icon(
-            Icons.location_off_outlined,
-            size: 48,
-            color: primaryColor,
+          Container(
+            width: 64,
+            height: 64,
+
+            decoration: BoxDecoration(
+              color:
+                  primaryColor.withValues(
+                alpha: 0.10,
+              ),
+              shape: BoxShape.circle,
+            ),
+
+            child: const Icon(
+              Icons.location_off_outlined,
+              size: 30,
+              color: primaryColor,
+            ),
           ),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
 
           Text(
             isSearching
                 ? 'Nenhum local encontrado.'
                 : 'Nenhum local cadastrado.',
+
             textAlign: TextAlign.center,
+
             style: const TextStyle(
-              color: secondaryTextColor,
+              color: textColor,
               fontSize: 16,
+              fontWeight:
+                  FontWeight.w600,
             ),
           ),
+
+          const SizedBox(height: 6),
+
+          if (isSearching)
+            const Text(
+              'Tente buscar por outro nome.',
+              textAlign: TextAlign.center,
+
+              style: TextStyle(
+                color: secondaryTextColor,
+                fontSize: 13,
+              ),
+            ),
         ],
       ),
     );
@@ -462,38 +888,88 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildError() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
+
+      padding: const EdgeInsets.all(28),
+
       decoration: BoxDecoration(
         color: surfaceColor,
-        borderRadius: BorderRadius.circular(16),
+
+        borderRadius:
+            BorderRadius.circular(17),
+
+        border: Border.all(
+          color: Colors.redAccent
+              .withValues(
+            alpha: 0.15,
+          ),
+        ),
       ),
+
       child: Column(
         children: [
-          const Icon(
-            Icons.error_outline,
-            size: 48,
-            color: Colors.redAccent,
+          Container(
+            width: 60,
+            height: 60,
+
+            decoration: BoxDecoration(
+              color: Colors.redAccent
+                  .withValues(
+                alpha: 0.10,
+              ),
+              shape: BoxShape.circle,
+            ),
+
+            child: const Icon(
+              Icons.error_outline_rounded,
+              size: 30,
+              color: Colors.redAccent,
+            ),
           ),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
 
           const Text(
             'Não foi possível carregar os locais.',
             textAlign: TextAlign.center,
+
             style: TextStyle(
               color: textColor,
               fontSize: 16,
+              fontWeight:
+                  FontWeight.w600,
             ),
           ),
 
           const SizedBox(height: 16),
 
-          FilledButton(
+          FilledButton.icon(
             onPressed: _loadPlaces,
-            style: FilledButton.styleFrom(
-              backgroundColor: primaryColor,
+
+            style:
+                FilledButton.styleFrom(
+              backgroundColor:
+                  primaryColor,
+
+              foregroundColor:
+                  Colors.white,
+
+              shape:
+                  RoundedRectangleBorder(
+                borderRadius:
+                    BorderRadius.circular(
+                  12,
+                ),
+              ),
             ),
-            child: const Text('Tentar novamente'),
+
+            icon: const Icon(
+              Icons.refresh_rounded,
+              size: 19,
+            ),
+
+            label: const Text(
+              'Tentar novamente',
+            ),
           ),
         ],
       ),
